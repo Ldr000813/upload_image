@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { imageBase64 } = await req.json();
+  try {
+    // バイナリ取得
+    const arrayBuffer = await req.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-  const dataUrl = `data:image/png;base64,${imageBase64}`;
+    // base64へ変換
+    const base64 = buffer.toString("base64");
+    const dataUrl = `data:image/png;base64,${base64}`;
 
-  await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/latest`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ imageBase64: dataUrl })
-  });
+    // 保存処理
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/latest`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageBase64: dataUrl }),
+    });
 
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ status: "ok" });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: String(e) }, { status: 500 });
+  }
 }
