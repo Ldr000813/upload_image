@@ -1,29 +1,31 @@
 "use client";
-
 import { useState } from "react";
 
-export default function UploadView() {
-  const [imageUrl, setImageUrl] = useState("");
+export default function UploadTest() {
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
 
-  async function uploadTest() {
-    // テスト用（Power Automate から来る実データとは別）
+  const handleUpload = async (e: any) => {
+    const file = e.target.files[0];
     const res = await fetch("/api/upload", {
       method: "POST",
-      body: new Blob(["test"], { type: "image/png" }) // ダミー送信
+      body: file
     });
-
     const data = await res.json();
-    setImageUrl(data.url);
-  }
+    setImgSrc(data.image);
+  };
 
   return (
-    <div>
-      <button onClick={uploadTest}>Upload Test</button>
-      {imageUrl && (
-        <>
-          <h2>Uploaded Image:</h2>
-          <img src={imageUrl} alt="uploaded image" />
-        </>
+    <div className="p-4">
+      <h1>Upload Test</h1>
+
+      <input type="file" onChange={handleUpload} />
+
+      {imgSrc && (
+        <img
+          src={imgSrc}
+          alt="uploaded"
+          style={{ width: "300px", marginTop: "20px" }}
+        />
       )}
     </div>
   );

@@ -1,26 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
-    // raw binary を取得
     const arrayBuffer = await req.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // 保存先
-    const fileName = `upload_${Date.now()}.png`;
-    const filePath = path.join(process.cwd(), "public", "uploads", fileName);
+    // base64 にして返す
+    const base64 = buffer.toString("base64");
 
-    // 保存
-    await writeFile(filePath, buffer);
-
-    // フロントで表示可能なURLを返す
     return NextResponse.json({
-      url: `/uploads/${fileName}`
+      image: `data:image/png;base64,${base64}`
     });
   } catch (error) {
     console.error(error);
-    return new NextResponse("Error uploading file", { status: 500 });
+    return new NextResponse("Error", { status: 500 });
   }
 }
