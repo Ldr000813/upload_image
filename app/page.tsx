@@ -1,31 +1,28 @@
 "use client";
+
 import { useState } from "react";
 
-export default function UploadTest() {
-  const [imgSrc, setImgSrc] = useState<string | null>(null);
+export default function Home() {
+  const [imageSrc, setImageSrc] = useState("");
 
-  const handleUpload = async (e: any) => {
-    const file = e.target.files[0];
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: file
-    });
+  async function fetchLatest() {
+    const res = await fetch("/api/latest", { cache: "no-store" });
     const data = await res.json();
-    setImgSrc(data.image);
-  };
+    setImageSrc(data.imageBase64);
+  }
 
   return (
-    <div className="p-4">
-      <h1>Upload Test</h1>
+    <div style={{ padding: 20 }}>
+      <h1>Uploaded Image Viewer</h1>
 
-      <input type="file" onChange={handleUpload} />
+      <button onClick={fetchLatest}>
+        最新の画像を読み込む
+      </button>
 
-      {imgSrc && (
-        <img
-          src={imgSrc}
-          alt="uploaded"
-          style={{ width: "300px", marginTop: "20px" }}
-        />
+      {imageSrc && (
+        <div style={{ marginTop: 20 }}>
+          <img src={imageSrc} width="300" />
+        </div>
       )}
     </div>
   );
